@@ -1,30 +1,44 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 import numpy as np
+from typing import Generator
 
-def ScatterRegression(x, xlabel, nfig):
+def ScatterRegression(fig: Figure, x: pd.Series, xlabel: str, nsubfig: int) -> Generator[tuple[int, int], tuple[pd.Series, str], None]:
     n = 0
     x_line = np.linspace(x.min(), x.max(), 100)
-    while n < nfig:
+    y: pd.Series
+    ylabel: str
+    ax: Axes
+    def plot_line(ax: Axes, y: pd.Series, color: str = "red") -> None:
+        def get_plot_args() -> tuple[np.ndarray, str]:
+            def make_args(a, b) -> tuple[np.ndarray, str]:
+                return a * x_line + b, f"fit: y={a:.2f}x+{b:.2f}"
+            
+            return make_args(*np.polyfit(x, y, 1)) 
+        
+        line, label = get_plot_args()
+        ax.plot(x_line, line, "-", color=color, label=label)
+    
+    while n < nsubfig:
         n += 1
-        y1, label = yield n
-        ax = fig.add_subplot(1, nfig, n)
-        ax.plot(x, y1, ".", label="data")
-        a1, b1 = np.polyfit(x, y1, 1)
-        y1_line = a1 * x_line + b1
-        ax.plot(x_line, y1_line, "-", color="red", label=f"fit: y={a1:.2f}x+{b1:.2f}")
+        y, ylabel = yield n, nsubfig
+        ax = fig.add_subplot(1, nsubfig, n)
+        ax.plot(x, y, ".", label="data")
+        plot_line(ax, y)
         ax.set_xlabel(xlabel, fontsize=8)
-        ax.set_ylabel(label, fontsize=8)
+        ax.set_ylabel(ylabel, fontsize=8)
         ax.legend(fontsize=6)
 
 # Load data
 data = pd.read_csv("/content/drive/MyDrive/TechRep_work/score.csv")
 
-scatter_regression = ScatterRegression(data["売上高(億円)"], "Amount of Sale", 3)
-next(scatter_regression)
-
 # Draw graphs
 fig = plt.figure(figsize=(12, 4))
+
+scatter_regression = ScatterRegression(fig, data["売上高(億円)"], "Amount of Sale", 3)
+next(scatter_regression)
 
 scatter_regression.send((data["1.接客スコア"], "Score of Hospitality"))
 scatter_regression.send((data["2.品揃えスコア"], "Score of Assortment"))
