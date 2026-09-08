@@ -36,7 +36,8 @@ class Quest(tuple[str, ...]):
         return "\n".join(f"{i + 1}. {choice}" for i, choice in enumerate(self))
 
     @Str2IdxWrapper
-    def __contains__(self, obj) -> bool:
+    def __contains__(self, obj) -> bool:  # pyright: ignore[reportIncompatibleMethodOverride]
+
         if isinstance(obj, int):
             return obj in range(1, len(self) + 1)
 
