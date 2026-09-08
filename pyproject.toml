@@ -1,0 +1,27 @@
+[project]
+name = "py"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "ishp_ctrin", email = "s26G1012DS@chibatech.ac.jp" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+py = "py:main"
+
+[build-system]
+requires = ["uv_build>=0.12.7,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.411",
+    "ruff>=0.16.6",
+    "ty>=0.0.79",
+]
+
+[tool.uv]
+package = false
