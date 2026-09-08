@@ -1,26 +1,31 @@
-import pandas as pd
+from collections.abc import Generator
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-import numpy as np
-from typing import Generator
 
-def ScatterRegression(fig: Figure, x: pd.Series, xlabel: str, nsubfig: int) -> Generator[tuple[int, int], tuple[pd.Series, str], None]:
+
+def ScatterRegression(
+    fig: Figure, x: pd.Series, xlabel: str, nsubfig: int
+) -> Generator[tuple[int, int], tuple[pd.Series, str]]:
     n = 0
     x_line = np.linspace(x.min(), x.max(), 100)
     y: pd.Series
     ylabel: str
     ax: Axes
+
     def plot_line(ax: Axes, y: pd.Series, color: str = "red") -> None:
         def get_plot_args() -> tuple[np.ndarray, str]:
             def make_args(a, b) -> tuple[np.ndarray, str]:
                 return a * x_line + b, f"fit: y={a:.2f}x+{b:.2f}"
-            
-            return make_args(*np.polyfit(x, y, 1)) 
-        
+
+            return make_args(*np.polyfit(x, y, 1))
+
         line, label = get_plot_args()
         ax.plot(x_line, line, "-", color=color, label=label)
-    
+
     while n < nsubfig:
         n += 1
         y, ylabel = yield n, nsubfig
@@ -30,6 +35,7 @@ def ScatterRegression(fig: Figure, x: pd.Series, xlabel: str, nsubfig: int) -> G
         ax.set_xlabel(xlabel, fontsize=8)
         ax.set_ylabel(ylabel, fontsize=8)
         ax.legend(fontsize=6)
+
 
 # Load data
 data = pd.read_csv("/content/drive/MyDrive/TechRep_work/score.csv")
